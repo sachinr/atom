@@ -427,14 +427,12 @@ class TextEditor extends Model
     @displayBuffer.onDidChangeCharacterWidths(callback)
 
   onDidChangeScrollTop: (callback) ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::onDidChangeScrollTop instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::onDidChangeScrollTop instead.")
 
     atom.views.getView(this).onDidChangeScrollTop(callback)
 
   onDidChangeScrollLeft: (callback) ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::onDidChangeScrollLeft instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::onDidChangeScrollLeft instead.")
 
     atom.views.getView(this).onDidChangeScrollLeft(callback)
 
@@ -1260,7 +1258,7 @@ class TextEditor extends Model
   # is invalidated, or is destroyed, the decoration will be updated to reflect
   # the marker's state.
   #
-  # There are three types of supported decorations:
+  # The following are the supported decorations types:
   #
   # * __line__: Adds your CSS `class` to the line nodes within the range
   #     marked by the marker
@@ -1276,36 +1274,46 @@ class TextEditor extends Model
   #       <div class="region"></div>
   #     </div>
   #     ```
+  # * __overlay__: Positions the view associated with the given item at the head
+  #     or tail of the given `Marker`.
+  # * __gutter__: A decoration that tracks a {Marker} in a {Gutter}. Gutter
+  #     decorations are created by calling {Gutter::decorateMarker} on the
+  #     desired `Gutter` instance.
   #
   # ## Arguments
   #
   # * `marker` A {Marker} you want this decoration to follow.
   # * `decorationParams` An {Object} representing the decoration e.g.
   #   `{type: 'line-number', class: 'linter-error'}`
-  #   * `type` There are a few supported decoration types: `line-number`, `line`,
-  #     `highlight`, and `overlay`. The behavior of the types are as follows:
-  #     * `line-number` Adds the given `class` to the line numbers overlapping the
-  #       rows spanned by the marker.
+  #   * `type` There are several supported decoration types. The behavior of the
+  #     types are as follows:
   #     * `line` Adds the given `class` to the lines overlapping the rows
-  #        spanned by the marker.
+  #        spanned by the `Marker`.
+  #     * `line-number` Adds the given `class` to the line numbers overlapping
+  #       the rows spanned by the `Marker`.
   #     * `highlight` Creates a `.highlight` div with the nested class with up
-  #       to 3 nested regions that fill the area spanned by the marker.
+  #       to 3 nested regions that fill the area spanned by the `Marker`.
   #     * `overlay` Positions the view associated with the given item at the
-  #       head or tail of the given marker, depending on the `position`
+  #       head or tail of the given `Marker`, depending on the `position`
   #       property.
+  #     * `gutter` Tracks a {Marker} in a {Gutter}. Created by calling
+  #       {Gutter::decorateMarker} on the desired `Gutter` instance.
   #   * `class` This CSS class will be applied to the decorated line number,
   #     line, highlight, or overlay.
+  #   * `item` (optional) An {HTMLElement} or a model {Object} with a
+  #     corresponding view registered. Only applicable to the `gutter` and
+  #     `overlay` types.
   #   * `onlyHead` (optional) If `true`, the decoration will only be applied to
-  #     the head of the marker. Only applicable to the `line` and `line-number`
-  #     types.
-  #   * `onlyEmpty` (optional) If `true`, the decoration will only be applied if
-  #     the associated marker is empty. Only applicable to the `line` and
+  #     the head of the `Marker`. Only applicable to the `line` and
   #     `line-number` types.
+  #   * `onlyEmpty` (optional) If `true`, the decoration will only be applied if
+  #     the associated `Marker` is empty. Only applicable to the `gutter`,
+  #     `line`, and `line-number` types.
   #   * `onlyNonEmpty` (optional) If `true`, the decoration will only be applied
-  #     if the associated marker is non-empty.  Only applicable to the `line`
-  #     and `line-number` types.
+  #     if the associated `Marker` is non-empty. Only applicable to the
+  #     `gutter`, `line`, and `line-number` types.
   #   * `position` (optional) Only applicable to decorations of type `overlay`,
-  #     controls where the overlay view is positioned relative to the marker.
+  #     controls where the overlay view is positioned relative to the `Marker`.
   #     Values can be `'head'` (the default), or `'tail'`.
   #
   # Returns a {Decoration} object
@@ -2856,28 +2864,24 @@ class TextEditor extends Model
     @displayBuffer.scrollToScreenPosition(screenPosition, options)
 
   scrollToTop: ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::scrollToTop instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::scrollToTop instead.")
 
     atom.views.getView(this).scrollToTop()
 
   scrollToBottom: ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::scrollToTop instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::scrollToTop instead.")
 
     atom.views.getView(this).scrollToBottom()
 
   scrollToScreenRange: (screenRange, options) -> @displayBuffer.scrollToScreenRange(screenRange, options)
 
   getHorizontalScrollbarHeight: ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::getHorizontalScrollbarHeight instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::getHorizontalScrollbarHeight instead.")
 
     atom.views.getView(this).getHorizontalScrollbarHeight()
 
   getVerticalScrollbarWidth: ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::getVerticalScrollbarWidth instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::getVerticalScrollbarWidth instead.")
 
     atom.views.getView(this).getVerticalScrollbarWidth()
 
@@ -2895,7 +2899,9 @@ class TextEditor extends Model
 
   # Returns the number of rows per page
   getRowsPerPage: ->
-    Math.max(1, Math.floor(@getHeight() / @getLineHeightInPixels()))
+    Math.max(@rowsPerPage ? 1, 1)
+
+  setRowsPerPage: (@rowsPerPage) ->
 
   ###
   Section: Config
@@ -2943,23 +2949,19 @@ class TextEditor extends Model
     @emitter.emit 'did-change-placeholder-text', @placeholderText
 
   getFirstVisibleScreenRow: ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::getFirstVisibleScreenRow instead.")
+    deprecate("This is now a view method. Call TextEditorElement::getFirstVisibleScreenRow instead.")
     atom.views.getView(this).getVisibleRowRange()[0]
 
   getLastVisibleScreenRow: ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::getLastVisibleScreenRow instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::getLastVisibleScreenRow instead.")
     atom.views.getView(this).getVisibleRowRange()[1]
 
   pixelPositionForBufferPosition: (bufferPosition) ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This method is deprecated on the model layer. Use `TextEditorElement::pixelPositionForBufferPosition` instead")
+    Grim.deprecate("This method is deprecated on the model layer. Use `TextEditorElement::pixelPositionForBufferPosition` instead")
     atom.views.getView(this).pixelPositionForBufferPosition(bufferPosition)
 
   pixelPositionForScreenPosition: (screenPosition) ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This method is deprecated on the model layer. Use `TextEditorElement::pixelPositionForScreenPosition` instead")
+    Grim.deprecate("This method is deprecated on the model layer. Use `TextEditorElement::pixelPositionForScreenPosition` instead")
     atom.views.getView(this).pixelPositionForScreenPosition(screenPosition)
 
   getSelectionMarkerAttributes: ->
@@ -2990,13 +2992,11 @@ class TextEditor extends Model
     if reentrant
       @displayBuffer.setHeight(height)
     else
-      # TODO: put back once core & bundled packages are updated not to use this.
-      # Grim.deprecate("This is now a view method. Call TextEditorElement::setHeight instead.")
+      Grim.deprecate("This is now a view method. Call TextEditorElement::setHeight instead.")
       atom.views.getView(this).setHeight(height)
 
   getHeight: ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::getHeight instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::getHeight instead.")
     @displayBuffer.getHeight()
 
   getClientHeight: -> @displayBuffer.getClientHeight()
@@ -3005,13 +3005,11 @@ class TextEditor extends Model
     if reentrant
       @displayBuffer.setWidth(width)
     else
-      # TODO: put back once core & bundled packages are updated not to use this.
-      # Grim.deprecate("This is now a view method. Call TextEditorElement::setWidth instead.")
+      Grim.deprecate("This is now a view method. Call TextEditorElement::setWidth instead.")
       atom.views.getView(this).setWidth(width)
 
   getWidth: ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::getWidth instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::getWidth instead.")
     @displayBuffer.getWidth()
 
   getScrollRow: -> @scrollRow
@@ -3021,92 +3019,77 @@ class TextEditor extends Model
   setScrollColumn: (@scrollColumn) ->
 
   getScrollTop: ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::getScrollTop instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::getScrollTop instead.")
 
     atom.views.getView(this).getScrollTop()
 
   setScrollTop: (scrollTop) ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::setScrollTop instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::setScrollTop instead.")
 
     atom.views.getView(this).setScrollTop(scrollTop)
 
   getScrollBottom: ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::getScrollBottom instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::getScrollBottom instead.")
 
     atom.views.getView(this).getScrollBottom()
 
   setScrollBottom: (scrollBottom) ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::setScrollBottom instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::setScrollBottom instead.")
 
     atom.views.getView(this).setScrollBottom(scrollBottom)
 
   getScrollLeft: ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::getScrollLeft instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::getScrollLeft instead.")
 
     atom.views.getView(this).getScrollLeft()
 
   setScrollLeft: (scrollLeft) ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::setScrollLeft instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::setScrollLeft instead.")
 
     atom.views.getView(this).setScrollLeft(scrollLeft)
 
   getScrollRight: ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::getScrollRight instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::getScrollRight instead.")
 
     atom.views.getView(this).getScrollRight()
 
   setScrollRight: (scrollRight) ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::setScrollRight instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::setScrollRight instead.")
 
     atom.views.getView(this).setScrollRight(scrollRight)
 
   getScrollHeight: ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::getScrollHeight instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::getScrollHeight instead.")
 
     atom.views.getView(this).getScrollHeight()
 
   getScrollWidth: ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::getScrollWidth instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::getScrollWidth instead.")
 
     atom.views.getView(this).getScrollWidth()
 
   getVisibleRowRange: ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::getVisibleRowRange instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::getVisibleRowRange instead.")
 
     atom.views.getView(this).getVisibleRowRange()
 
   intersectsVisibleRowRange: (startRow, endRow) ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::intersectsVisibleRowRange instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::intersectsVisibleRowRange instead.")
 
     atom.views.getView(this).intersectsVisibleRowRange(startRow, endRow)
 
   selectionIntersectsVisibleRowRange: (selection) ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::selectionIntersectsVisibleRowRange instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::selectionIntersectsVisibleRowRange instead.")
 
     atom.views.getView(this).selectionIntersectsVisibleRowRange(selection)
 
   screenPositionForPixelPosition: (pixelPosition) ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::screenPositionForPixelPosition instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::screenPositionForPixelPosition instead.")
 
     atom.views.getView(this).screenPositionForPixelPosition(pixelPosition)
 
   pixelRectForScreenRange: (screenRange) ->
-    # TODO: put back once core & bundled packages are updated not to use this.
-    # Grim.deprecate("This is now a view method. Call TextEditorElement::pixelRectForScreenRange instead.")
+    Grim.deprecate("This is now a view method. Call TextEditorElement::pixelRectForScreenRange instead.")
 
     atom.views.getView(this).pixelRectForScreenRange(screenRange)
 
